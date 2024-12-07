@@ -4,6 +4,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import CardMedia from "@mui/material/CardMedia";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import { Product } from "../models/productModel";
 import { LoadProductById } from "../services/productService.tsx";
 import { useCart } from "../services/CartContext.tsx";
@@ -13,6 +15,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addToCart } = useCart();
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -44,6 +47,11 @@ const ProductDetails = () => {
     setCurrentImageIndex((prevIndex) => 
       (prevIndex - 1 + product.imageUrls.length) % product.imageUrls.length
     );
+  };
+
+  const handleAddToCart = () => {
+    addToCart(product); // Dodavanje proizvoda u korpu
+    setSnackbarOpen(true); // Prikaz obaveštenja
   };
 
   return (
@@ -78,12 +86,26 @@ const ProductDetails = () => {
         <Button 
           variant="contained" 
           color="primary" 
-          onClick={() => addToCart(product)} 
+          onClick={() => handleAddToCart()} 
           sx={{ marginTop: 2 }}
         >
           Dodaj u korpu
         </Button>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)} // Ručno zatvaranje
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={5000} // Automatsko zatvaranje nakon 3 sekunde
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)} // Dodata kontrola za dugme zatvaranja
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Proizvod je dodat u korpu!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
